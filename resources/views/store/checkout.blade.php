@@ -43,6 +43,14 @@
                 Place Order
             </button>
         </form>
+        <form method="POST" action="{{ route('paymob.pay') }}">
+    @csrf
+    <input type="hidden" name="total_cents" value="{{ $total_cents }}">
+    <button class="bg-indigo-600 text-white px-4 py-2 rounded">
+        Pay with Card
+    </button>
+</form>
+
     @endif
 
 </div>

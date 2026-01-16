@@ -12,7 +12,10 @@ use App\Http\Controllers\Store\StoreController;
 use App\Http\Controllers\Store\ProductController;
 use App\Http\Controllers\Store\CartController;
 use App\Http\Controllers\Store\CheckoutController;
+use App\Http\Controllers\Store\PaymobController;
 
+Route::post('/paymob/pay', [PaymobController::class, 'pay'])
+    ->name('paymob.pay');
 // Public routes
 Route::get('/', function () {
     return redirect()->route('store.home');
@@ -31,7 +34,8 @@ Route::middleware(['throttle:120,1'])->group(function () {
     Route::post('/cart/remove', [CartController::class, 'remove'])->name('store.cart.remove');
     Route::post('/cart/clear', [CartController::class, 'clear'])->name('store.cart.clear');
 
-    Route::get('/checkout', [CheckoutController::class, 'show'])->name('store.checkout');
+    Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/checkout', [CheckoutController::class, 'submit'])->name('store.checkout.submit');
     Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('store.checkout.success');
     Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('store.checkout.cancel');
@@ -40,7 +44,7 @@ Route::middleware(['throttle:120,1'])->group(function () {
 // Public invoice routes (keep old module)
 Route::middleware(['throttle:60,1'])->group(function () {
     Route::get('/i/{token}', [PublicInvoiceController::class, 'show'])->name('invoice.show');
-    Route::post('/i/{token}/pay', [PublicInvoiceController::class, 'pay'])->name('invoice.pay');
+Route::post('/i/{token}/pay', [PublicInvoiceController::class, 'pay'])->name('invoice.pay');
     Route::get('/success', [PublicInvoiceController::class, 'success'])->name('invoice.success');
     Route::get('/cancel', [PublicInvoiceController::class, 'cancel'])->name('invoice.cancel');
 });

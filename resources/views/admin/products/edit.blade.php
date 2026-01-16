@@ -46,8 +46,17 @@
         <textarea name="description" class="mt-1 w-full rounded-lg border-gray-300" rows="4">{{ old('description',$product->description) }}</textarea>
       </div>
 
-      <button class="rounded-lg bg-blue-600 px-4 py-2 text-white">Save</button>
-      <a href="{{ route('admin.products.index') }}" class="ml-3 text-gray-600 hover:text-gray-900">Back</a>
-    </form>
+     <div>
+    <label class="block text-sm text-gray-700">Image</label>
+    <input type="file" name="image" accept="image/*" class="mt-1 w-full rounded-lg border-gray-300">
+    @if($product->image)
+      <img src="{{ asset('storage/products/' . $product->image) }}" class="mt-2 w-24 h-24 object-cover rounded" alt="Product image">
+    @endif
+    @error('image') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
+  </div>
+
+  <button class="rounded-lg bg-blue-600 px-4 py-2 text-white">Save</button>
+  <a href="{{ route('admin.products.index') }}" class="ml-3 text-gray-600 hover:text-gray-900">Back</a>
+</form>
   </div>
 @endsection

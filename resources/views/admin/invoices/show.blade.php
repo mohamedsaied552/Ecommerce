@@ -85,30 +85,48 @@
             </div>
 
             <!-- Payment Link -->
-            <div class="bg-white shadow rounded-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-lg font-medium text-gray-900">Payment Link</h2>
-                </div>
-                <div class="px-6 py-4">
-                    <div class="flex items-center gap-2">
-                        <input
-                            type="text"
-                            id="paymentLink"
-                            value="{{ $invoice->payment_link }}"
-                            readonly
-                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm font-mono"
-                        >
-                        <button
-                            onclick="copyPaymentLink()"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                            <x-icon name="clipboard" class="mr-2 h-4 w-4" />
-                            Copy
-                        </button>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-500">Share this link with the customer to allow them to pay.</p>
-                </div>
-            </div>
+            <!-- Payment Section -->
+<div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-900">Payment</h2>
+    </div>
+    <div class="px-6 py-4 space-y-2">
+        <p class="text-sm text-gray-500">Use the link below to pay this invoice:</p>
+
+        <!-- Payment Link (copy) -->
+        <div class="flex items-center gap-2 mb-2">
+            <input type="text" id="paymentLink" value="{{ $invoice->payment_link }}" readonly
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm font-mono">
+            <button onclick="copyPaymentLink()"
+                class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                Copy Link
+            </button>
+        </div>
+
+        <!-- Pay Now button -->
+        @if($invoice->canBePaid())
+        <form method="POST" action="{{ route('invoice.pay', $invoice->payment_link_token) }}">
+            @csrf
+            <button type="submit"
+                class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                <x-icon name="credit-card" class="mr-2 h-4 w-4 text-white" />
+                Pay Now
+            </button>
+        </form>
+        @endif
+    </div>
+</div>
+
+<script>
+function copyPaymentLink() {
+    const link = document.getElementById('paymentLink');
+    link.select();
+    link.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    alert('Payment link copied to clipboard!');
+}
+</script>
+
 
             <!-- Payment History -->
             @if($invoice->payments->count() > 0)
@@ -305,5 +323,17 @@ function copyPaymentLink() {
         alert('Payment link copied to clipboard!');
     }
 }
+@if(!$invoice->isPaid())
+    <div class="mt-4">
+        <form method="POST" action="{{ route('invoice.pay', $invoice->payment_link_token) }}">
+            @csrf
+            <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                <x-icon name="credit-card" class="mr-2 h-4 w-4 text-white" />
+                Pay Now
+            </button>
+        </form>
+    </div>
+@endif
+
 </script>
 @endsection

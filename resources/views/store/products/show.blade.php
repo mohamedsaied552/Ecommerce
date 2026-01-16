@@ -52,6 +52,7 @@
         <div class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4 text-green-700 text-sm">
           {{ session('success') }}
         </div>
+        
       @endif
     </div>
   </div>

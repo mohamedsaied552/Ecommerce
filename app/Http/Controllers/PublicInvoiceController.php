@@ -10,89 +10,91 @@ use Illuminate\Support\Facades\Log;
 class PublicInvoiceController extends Controller
 {
     /**
-     * Display public invoice page
+     * Show public invoice page
      */
     public function show(string $token)
     {
         $invoice = Invoice::where('payment_link_token', $token)->firstOrFail();
-
         return view('public.invoice', compact('invoice'));
     }
 
     /**
-     * Initiate payment - redirect to Paymob checkout
+     * Redirect user to Paymob payment page
      */
     public function pay(Request $request, string $token)
     {
         $invoice = Invoice::where('payment_link_token', $token)->firstOrFail();
 
-        // Check if invoice can be paid
+        // Prevent paying invalid invoice
         if (!$invoice->canBePaid()) {
-            return redirect()->route('invoice.show', $token)
-                ->with('error', 'This invoice cannot be paid. It may have already been paid or expired.');
+            return redirect()
+                ->route('invoice.show', $token)
+                ->with('error', 'Invoice cannot be paid.');
         }
 
-        // Prevent duplicate payment attempts (idempotency)
+        // Prevent duplicate payments
         if ($invoice->payments()->where('status', 'initiated')->exists()) {
-            return redirect()->route('invoice.show', $token)
-                ->with('error', 'A payment is already in progress for this invoice.');
+            return redirect()
+                ->route('invoice.show', $token)
+                ->with('error', 'Payment already in progress.');
         }
 
         try {
-            $paymobService = new PaymobService();
+            $paymob = new PaymobService();
 
-            // Prepare billing data
+            // Required billing data for Paymob
             $billingData = [
-                'amount_cents' => $invoice->amount_cents,
-                'apartment' => 'NA',
-                'email' => $invoice->customer_email ?? 'customer@example.com',
-                'floor' => 'NA',
-                'first_name' => $invoice->customer_name ?? 'Customer',
-                'street' => 'NA',
-                'building' => 'NA',
-                'phone_number' => $invoice->customer_phone ?? '00000000000',
-                'shipping_method' => 'NA',
-                'postal_code' => 'NA',
-                'city' => 'NA',
-                'country' => 'EG',
-                'last_name' => 'NA',
-                'state' => 'NA',
+                'first_name'     => $invoice->customer_name ?? 'Customer',
+                'last_name'      => 'NA',
+                'email'          => $invoice->customer_email ?? 'customer@example.com',
+                'phone_number'   => $invoice->customer_phone ?? '01000000000',
+                'apartment'      => 'NA',
+                'floor'          => 'NA',
+                'street'         => 'NA',
+                'building'       => 'NA',
+                'shipping_method'=> 'NA',
+                'postal_code'    => '00000',
+                'city'           => 'Cairo',
+                'state'          => 'Cairo',
+                'country'        => 'EG',
             ];
 
-            // Get checkout URL
-            $checkoutUrl = $paymobService->getCheckoutUrlForInvoice(
+            // Generate Paymob checkout URL
+            $checkoutUrl = $paymob->getCheckoutUrlForInvoice(
                 $invoice->amount_cents,
                 $invoice->invoice_number,
                 $billingData
             );
 
-            // Create payment record
+            // Save initiated payment
             $payment = $invoice->payments()->create([
                 'gateway' => 'paymob',
-                'status' => 'initiated',
+                'status'  => 'initiated',
             ]);
 
-            Log::info('Payment initiated', [
+            Log::info('Paymob payment started', [
                 'invoice_id' => $invoice->id,
                 'payment_id' => $payment->id,
-                'checkout_url' => $checkoutUrl,
+                'url'        => $checkoutUrl,
             ]);
 
-            // Redirect to Paymob checkout
-            return redirect($checkoutUrl);
-        } catch (\Exception $e) {
-            Log::error('Payment initiation failed', [
+            // IMPORTANT: redirect OUTSIDE Laravel
+            return redirect()->away($checkoutUrl);
+
+        } catch (\Throwable $e) {
+            Log::error('Paymob error', [
                 'invoice_id' => $invoice->id,
                 'error' => $e->getMessage(),
             ]);
 
-            return redirect()->route('invoice.show', $token)
-                ->with('error', 'Failed to initiate payment. Please try again later.');
+            return redirect()
+                ->route('invoice.show', $token)
+                ->with('error', 'Payment failed. Try again.');
         }
     }
 
     /**
-     * Payment success page (not authoritative - webhook is source of truth)
+     * Success page (webhook is source of truth)
      */
     public function success()
     {
@@ -100,7 +102,7 @@ class PublicInvoiceController extends Controller
     }
 
     /**
-     * Payment cancel page
+     * Cancel page
      */
     public function cancel()
     {

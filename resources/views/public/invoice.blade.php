@@ -149,17 +149,12 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('invoice.pay', $invoice->payment_link_token) }}">
-                        @csrf
-                        <button
-                            type="submit"
-                            class="w-full flex items-center justify-center px-6 py-4 border border-transparent text-base font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
-                        >
-                            <x-icon name="credit-card" class="mr-3 h-5 w-5" />
-                            Pay Now
-                        </button>
-                    </form>
-
+        <form method="POST" action="{{ route('invoice.pay', $invoice->payment_link_token) }}">
+    @csrf
+    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        Pay Now
+    </button>
+                </form>
                     <p class="mt-4 text-center text-sm text-gray-500">
                         By clicking "Pay Now", you agree to proceed with the payment
                     </p>

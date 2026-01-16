@@ -50,7 +50,14 @@
           </tr>
         @empty
           <tr><td class="p-6 text-gray-600" colspan="4">No products yet.</td></tr>
-        @endforelse
+        <td class="p-4">
+  @if($p->image)
+    <img src="{{ asset('storage/products/' . $p->image) }}" class="w-12 h-12 object-cover rounded mr-2 inline" alt="{{ $p->name }}">
+  @endif
+  <div class="font-medium text-gray-900 inline">{{ $p->name }}</div>
+  <div class="text-gray-500">{{ $p->slug }}</div>
+</td>
+          @endforelse
       </tbody>
     </table>
   </div>
