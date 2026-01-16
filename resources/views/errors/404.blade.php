@@ -1,0 +1,40 @@
+@extends('layouts.public')
+
+@section('title', 'Invoice Not Found')
+
+@section('content')
+<div class="max-w-md w-full">
+    <div class="bg-white shadow-xl rounded-lg overflow-hidden text-center">
+        <div class="bg-gradient-to-r from-gray-500 to-gray-600 px-6 py-12">
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-white bg-opacity-20 mb-4">
+                <x-icon name="x-circle" class="h-10 w-10 text-white" />
+            </div>
+            <h1 class="text-3xl font-bold text-white">Invoice Not Found</h1>
+        </div>
+
+        <div class="px-6 py-8">
+            <p class="text-gray-600 mb-6">The invoice you're looking for doesn't exist or has been removed.</p>
+            
+            <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                <p class="text-gray-600">Please check the invoice link or contact us for assistance.</p>
+            </div>
+
+            <!-- Help Section -->
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Need Help?</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-center text-gray-600">
+                        <x-icon name="mail" class="mr-3 h-5 w-5 text-gray-400" />
+                        <span>Email: support@example.com</span>
+                    </div>
+                    <div class="flex items-center justify-center text-gray-600">
+                        <x-icon name="phone" class="mr-3 h-5 w-5 text-gray-400" />
+                        <span>WhatsApp: +20 123 456 7890</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
