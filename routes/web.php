@@ -51,6 +51,7 @@ Route::middleware(['throttle:100,1'])->group(function () {
         ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 });
 
+
 // Admin routes (authenticated)
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
 
