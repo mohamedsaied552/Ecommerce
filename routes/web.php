@@ -61,6 +61,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     Route::get('/dashboard', function () {
         $invoices = \App\Models\Invoice::with('latestPayment')->latest()->take(10)->get();
+        
         $stats = [
             'total' => \App\Models\Invoice::count(),
             'paid' => \App\Models\Invoice::where('status', 'paid')->count(),

@@ -54,7 +54,7 @@ class ProductController extends Controller
         Product::create($data);
 
         return redirect()->route('admin.products.index')
-                         ->with('success', 'Product created.');
+                    ->with('success', 'Product created.');
     }
 
     /**
@@ -70,21 +70,31 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:200'],
-            'slug' => ['nullable', 'string', 'max:220', 'unique:products,slug,' . $product->id],
-            'price_cents' => ['required', 'integer', 'min:1'],
-            'description' => ['nullable', 'string'],
-            'status' => ['required', 'in:active,inactive'],
-            'stock' => ['nullable', 'integer', 'min:0'],
-        ]);
+    $data = $request->validate([
+        'name' => ['required', 'string', 'max:200'],
+        'slug' => ['nullable', 'string', 'max:220', 'unique:products,slug'],
+        'price_cents' => ['required', 'integer', 'min:1'],
+        'description' => ['nullable', 'string'],
+        'status' => ['required', 'in:active,inactive'],
+        'stock' => ['nullable', 'integer', 'min:0'],
+        'image' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+    ]);
 
-        $data['slug'] = $data['slug'] ?: Str::slug($data['name']);
-        $product->update($data);
+    // generate slug
+    $data['slug'] = $data['slug'] ?: Str::slug($data['name']);
+    $data['currency'] = 'EGP';
 
-        return redirect()->route('admin.products.index')
-                         ->with('success', 'Product updated.');
+    // ✅ حفظ الصورة
+    if ($request->hasFile('image')) {
+        $data['image'] = $request->file('image')->store('products', 'public');
     }
+
+    Product::create($data);
+
+    return redirect()->route('admin.products.index')
+        ->with('success', 'Product created.');
+}
+
 
     /**
      * Remove the specified product from storage

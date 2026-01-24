@@ -37,12 +37,6 @@
             Total: {{ number_format($total_cents / 100, 2) }} EGP
         </div>
 
-        <form method="POST" action="{{ route('checkout.place') }}">
-            @csrf
-            <button class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-                Place Order
-            </button>
-        </form>
         <form method="POST" action="{{ route('paymob.pay') }}">
     @csrf
     <input type="hidden" name="total_cents" value="{{ $total_cents }}">
